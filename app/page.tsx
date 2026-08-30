@@ -3,7 +3,7 @@ import TrustBenefitsGrid from "@/components/TrustBenefitsGrid";
 
 export default function Home() {
   return (
-    <main>
+    <main className="flex-1">
       <Hero
         bgColor="#ffffff"
         imageDesktop={{

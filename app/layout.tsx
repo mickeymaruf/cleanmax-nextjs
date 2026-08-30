@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { silka, myriadProCondensed } from "./fonts";
 import Announcement from "@/components/Announcement";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { MAIN_MENU_LINKS, SHOP_ALL_LINK } from "@/components/navigation";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,6 +25,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <Header />
         {children}
+        <Footer
+          bgColor="#000e8a"
+          accentColor="#60d3ff"
+          menus={[
+            { title: "Productos", links: [...MAIN_MENU_LINKS, SHOP_ALL_LINK] },
+          ]}
+          contact={{
+            title: "NECESITÁS AYUDA?",
+            text: "Horarios de Atención: Lunes a Viernes \nde 9 a 18hs.",
+            newsletterHeading: "SUSCRIBITE Y RECIBÍ 10% OFF",
+            newsletterPlaceholder: "Dirección de email",
+            newsletterButtonText: "RECIBIR",
+          }}
+          social={{
+            facebook:
+              "https://www.facebook.com/people/Cleanmax/61590397002099/",
+            instagram: "https://instagram.com/cleanmax.com.ar",
+          }}
+          safetyIcon={{
+            src: "https://cleanmax.com.ar/cdn/shop/files/out-of-reach_70x70_f70a8083-f7ef-4e31-8c5c-d3be9d18da91_100x.png?v=1778520768",
+          }}
+          safetyText="Como todo producto de limpieza y detergentes para el hogar, mantener fuera del alcance de niños y mascotas."
+          copyrightSuffix=". Todos los derechos reservados."
+        />
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Logo from "@/public/clean-max-logo.png";
 import { useHeaderScrollHide } from "./useHeaderScrollHide";
+import { MAIN_MENU_LINKS, SHOP_ALL_LINK, type NavLink as BaseNavLink } from "./navigation";
 
 interface GrandChildLink {
   title: string;
@@ -15,9 +16,7 @@ interface ChildLink {
   links?: GrandChildLink[];
 }
 
-interface NavLink {
-  label: string;
-  href: string;
+interface NavLink extends BaseNavLink {
   children?: ChildLink[];
 }
 
@@ -31,16 +30,8 @@ interface PromoButton {
   subtitleColor: string;
 }
 
-// Static for now — will come from the WooCommerce menu once that's wired up.
-const NAV_LINKS: NavLink[] = [
-  { label: "Anti Hongos", href: "/products/antihongo" },
-  { label: "Anti Grasa", href: "/products/antigrasa" },
-  { label: "Quita Sarro", href: "/products/quita-sarro" },
-  { label: "Restaura Vidrios", href: "/products/restaura-vidrios" },
-  { label: "Quita Manchas", href: "/products/quita-manchas" },
-];
-
-const CTA_LINK: NavLink = { label: "Ver Todos", href: "/collections/shop-all" };
+const NAV_LINKS: NavLink[] = MAIN_MENU_LINKS;
+const CTA_LINK: NavLink = SHOP_ALL_LINK;
 
 // No blocks configured yet — same as the Liquid schema's empty default block list.
 const PROMO_BUTTONS: PromoButton[] = [];
@@ -67,7 +58,7 @@ export default function Header() {
         ref={headerRef}
         className="site-header relative bg-white lg:border-b lg:border-gray-100"
       >
-        <div className="relative top-0.5 mx-auto flex w-full max-w-7xl items-center px-4 lg:px-14 py-3 md:py-4">
+        <div className="relative top-0.5 mx-auto flex w-full max-w-7xl items-center px-4 lg:px-5 py-3 md:py-4">
           <div className="flex w-1/3 lg:w-fit lg:grow lg:basis-auto header-left">
             <button
               className="lg:hidden bg-transparent border-none shadow-none outline-none p-4 transition hover:opacity-50"

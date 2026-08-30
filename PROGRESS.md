@@ -1,53 +1,14 @@
-# Project Overview
+# Progress
 
-## Goal
-
-Convert an existing Shopify app/theme into a **headless WooCommerce storefront using Next.js**.
-
-The frontend will communicate with WordPress/WooCommerce through APIs.
-
-## Development Approach
-
-* Convert the project **one section at a time**.
-* Most section content should remain **static in Next.js**.
-* For each section, specific instructions will define what must become dynamic.
-* Do not make content dynamic unless explicitly required.
-* Preserve the existing design and behavior unless instructed otherwise.
-
-## WooCommerce Scope
-
-WordPress/WooCommerce will primarily manage:
-
-* Products
-* Product-related data
-* Cart-related functionality
-* Other dynamic commerce data when explicitly required
-
-## Customer Accounts
-
-* No login system initially.
-* No customer account functionality initially.
-* Shopping will support **guest users**.
-* Cart and session architecture will be designed separately when implementation reaches that stage.
-
-## Development Rules
-
-1. Work on one section at a time.
-2. Do not modify unrelated sections.
-3. Do not introduce unnecessary WordPress plugins or complexity.
-4. Prefer simple, maintainable architecture.
-5. Keep the Next.js frontend performant and SEO-friendly.
-6. Follow the specific dynamic/static requirements provided for each section.
-
-## Progress Tracking
-
-Maintain a `PROGRESS.md` file.
-
-After each meaningful work session:
-
-* Add only **2–3 short lines** describing what was completed.
-* Record architecture or technical decisions only when they are important for future work.
-* Do not write explanations, summaries, or unnecessary history.
-* Keep the file concise. If old information is no longer useful, remove or consolidate it.
-
-The progress file should function as a quick state reference, not documentation.
+- Converted Hero section (`cleanmax-reference/sections/hero.liquid`) to `components/Hero.tsx`.
+- All merchant-editable fields (bg color, desktop/mobile image, title, description, button label/link) are props with defaults matching the Liquid schema.
+- Wired into `app/page.tsx` above the scaffold content for visual check; not yet fed by WooCommerce data.
+- Switched hero images to Next's `getImageProps()` + `<picture>` "Art Direction" pattern: single-image download per breakpoint (native `<picture>` behavior) plus Next's responsive srcSet/format optimization. Added `images.remotePatterns` for `cleanmax.com.ar` in `next.config.ts`.
+- Converted Announcement (`cleanmax-reference/sections/announcement.liquid`) to `components/Announcement.tsx` — props for text/link/bgColor/textColor.
+- Converted Header (`cleanmax-reference/sections/header.liquid`) to `components/Header.tsx`. Nav links + CTA are hardcoded static content for now (no WooCommerce menu yet); logo uses a static import of `public/clean-max-logo.png` (1MB source) via `next/image` so it's resized/re-encoded and blur-placeholdered automatically.
+- Header is now a client component with a fully working mobile nav drawer (overlay, slide-in panel, close button, body-scroll lock), accordion support for submenus, and a sticky-on-scroll class — mirrors everything in `header.liquid` except the cart drawer. Cart button stays presentational only (static "0" badge, no drawer) — separate follow-up task.
+- Both new components wired into `app/layout.tsx` (site-wide chrome) above `{children}`; `Hero` stays in `app/page.tsx` as homepage-only content.
+- Converted Trust Benefits Grid (`cleanmax-reference/sections/trust-benefits-grid.liquid`) to `components/TrustBenefitsGrid.tsx`. Optional top image tiles (left/right, each with desktop/mobile variants) plus headline, up to 3 value blocks, and an optional button — all props.
+- Updated `app/page.tsx` call with real live-site copy for this section: empty headline and no button (both absent on the live page, so left unpassed — the `<h2>`/button JSX stay in the component either way), 3 real value blocks with actual icon URLs/titles/text. Top image grid still omitted (also absent live).
+- Value icons have white square backgrounds in the source files; added `mix-blend-multiply` to the icon `<Image>` so white blends into the section's light gradient background instead of showing as a box.
+- Ported the mobile scroll-hide animation from `cleanmax-reference/assets/global.js`/`global.css`: below `lg`, the header becomes sticky and slides up (with the announcement bar) on scroll-down, restoring on scroll-up. CSS lives in `app/globals.css` (`#AnnouncementBar`/`#MainHeader` + `.is-scrolled-up`); the scroll/resize listener is isolated in a new tiny `useHeaderScrollHide` hook (`components/useHeaderScrollHide.ts`) so `Announcement.tsx` stays a server component (just got an `id="AnnouncementBar"`) — only `Header.tsx`, already client for the drawer, holds the ref. Skipped the `#MobileQuickLinks`/product-section parts of the original script since that section doesn't exist in this app yet. Removed the earlier placeholder `is-sticky` toggle in `Header.tsx` (it had no matching CSS) in favor of this.

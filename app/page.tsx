@@ -2,64 +2,11 @@ import Hero from "@/components/Hero";
 import TrustBenefitsGrid from "@/components/TrustBenefitsGrid";
 import FeatureRowBullets from "@/components/FeatureRowBullets";
 import ProductList from "@/components/ProductList";
-import type { Product } from "@/components/ProductCard";
+import { getFeaturedProducts } from "@/lib/woocommerce";
 
-const FEATURED_PRODUCTS: Product[] = [
-  {
-    title: "Anti Hongos",
-    url: "/products/antihongo",
-    image: {
-      src: "https://cleanmax.com.ar/cdn/shop/files/ChatGPT_Image_5_jun_2026_11_31_19_p.m._600x600.png?v=1780713240",
-    },
-    rating: 4.5,
-    ratingCount: 9739,
-    shortDescription:
-      "Fórmula avanzada que elimina el moho desde la raíz, neutraliza el olor a humedad y ayuda a prevenir su reaparición en múltiples superficies.",
-    size: "500ml",
-    price: "$29.950",
-  },
-  {
-    title: "Restaura Vidrios",
-    url: "/products/restaura-vidrios",
-    image: {
-      src: "https://cleanmax.com.ar/cdn/shop/files/ChatGPTImage5jun2026_10_47_44p.m._600x600.png?v=1780710477",
-    },
-    rating: 4.5,
-    ratingCount: 1756,
-    shortDescription:
-      "Restaurá vidrios, mamparas y espejos opacos removiendo manchas de agua, sarro y residuos adheridos. Deja las superficies más transparentes, brillantes y con acabado cristalino.",
-    size: "500ml",
-    price: "$27.950",
-  },
-  {
-    title: "Anti Grasa",
-    url: "/products/antigrasa",
-    image: {
-      src: "https://cleanmax.com.ar/cdn/shop/files/07_-_01_600x600.png?v=1779978623",
-    },
-    rating: 4.5,
-    ratingCount: 1756,
-    shortDescription:
-      "Eliminá la grasa difícil de cocina en segundos. Ideal para mesadas, hornallas, campanas, azulejos y superficies lavables, dejando una limpieza profunda y fresca.",
-    size: "500ml",
-    price: "$9.750",
-  },
-  {
-    title: "Quita Sarro",
-    url: "/products/quita-sarro",
-    image: {
-      src: "https://cleanmax.com.ar/cdn/shop/files/WhatsAppImage2026-05-26at7.49.39PM_600x600.jpg?v=1780710190",
-    },
-    rating: 4.5,
-    ratingCount: 1756,
-    shortDescription:
-      "Remové sarro, manchas calcáreas y residuos de agua acumulados. Perfecto para baños, griferías, mamparas, cerámicos y lavabos con acción rápida.",
-    size: "500ml",
-    price: "$9.950",
-  },
-];
+export default async function Home() {
+  const featuredProducts = await getFeaturedProducts(4);
 
-export default function Home() {
   return (
     <main className="flex-1">
       <Hero
@@ -76,7 +23,7 @@ export default function Home() {
         btnLabel="VER TODO"
         btnLink="/collections/shop-all"
       />
-      <ProductList title="Tu Equipo de Limpieza" products={FEATURED_PRODUCTS} />
+      <ProductList title="Tu Equipo de Limpieza" products={featuredProducts} />
       <TrustBenefitsGrid
         headline=""
         values={[

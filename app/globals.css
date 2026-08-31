@@ -3,6 +3,18 @@
 @theme inline {
   --font-sans: var(--font-silka);
   --font-myriad-pro-condensed: var(--font-myriad-pro-condensed);
+
+  --color-primary: #000e8a;
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #dbe4ff;
+  --color-primary-200: #b7c9ff;
+  --color-primary-300: #84a3ff;
+  --color-primary-400: #4d75ff;
+  --color-primary-500: #1d4fff;
+  --color-primary-600: #0030e6;
+  --color-primary-700: #0026b4;
+  --color-primary-800: #001d82;
+  --color-primary-900: #000e8a;
 }
 
 body {

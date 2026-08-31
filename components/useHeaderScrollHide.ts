@@ -3,9 +3,10 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Mirrors cleanmax-reference/assets/global.js: below the `lg` breakpoint, slides the
- * header up to replace the announcement bar once the user scrolls down past it, and
- * restores both on scroll-up. Actual motion/positioning lives in app/globals.css.
+ * Sticky header that slides up to replace the announcement bar once the user scrolls
+ * down past it, and restores both on scroll-up. Based on cleanmax-reference/assets/global.js,
+ * extended to run at all widths (the reference only wired this up for mobile).
+ * Actual motion/positioning lives in app/globals.css.
  */
 export function useHeaderScrollHide<T extends HTMLElement>() {
   const headerRef = useRef<T>(null);
@@ -16,8 +17,6 @@ export function useHeaderScrollHide<T extends HTMLElement>() {
     let lastScrollTop = 0;
 
     function handleScroll() {
-      if (window.innerWidth >= 1024) return;
-
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const announceHeight = announcement?.offsetHeight ?? 0;
       document.documentElement.style.setProperty(

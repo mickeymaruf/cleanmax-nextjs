@@ -14,27 +14,28 @@ body {
   font-weight: 700;
 }
 
-/* Mobile header/announcement slide-up on scroll — mirrors cleanmax-reference/assets/global.css */
+/*
+ * Header/announcement slide-up on scroll. cleanmax-reference/assets/global.css only wires this
+ * for mobile (<1024px) — desktop sticky uses the same mechanism, extended to all widths.
+ */
 #AnnouncementBar,
 #MainHeader {
   transition: transform 0.3s ease-in-out !important;
   will-change: transform;
 }
 
-@media (max-width: 1023px) {
-  #MainHeader {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 110;
-  }
+#MainHeader {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 110;
+}
 
-  /* Announcement: moves up its own height to hide */
-  #AnnouncementBar.is-scrolled-up {
-    transform: translateY(var(--announce-height-neg)) !important;
-  }
+/* Announcement: moves up its own height to hide */
+#AnnouncementBar.is-scrolled-up {
+  transform: translateY(var(--announce-height-neg)) !important;
+}
 
-  /* Header: moves up by the announcement height to take its place at top:0 */
-  #MainHeader.is-scrolled-up {
-    transform: translateY(var(--announce-height-neg)) !important;
-  }
+/* Header: moves up by the announcement height to take its place at top:0 */
+#MainHeader.is-scrolled-up {
+  transform: translateY(var(--announce-height-neg)) !important;
 }

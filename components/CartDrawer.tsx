@@ -107,6 +107,7 @@ export default function CartDrawer({ checkoutUrl }: { checkoutUrl: string }) {
                       alt={item.image.alt}
                       width={80}
                       height={80}
+                      quality={85}
                       className="h-20 w-20 object-cover"
                     />
                   </Link>

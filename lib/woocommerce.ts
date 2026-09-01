@@ -1,4 +1,5 @@
 import type { Product } from "@/components/ProductCard";
+import { toWordPressWebp } from "@/lib/wordpress-image";
 
 const WOOCOMMERCE_URL = process.env.WOOCOMMERCE_URL;
 
@@ -7,6 +8,11 @@ if (!WOOCOMMERCE_URL) {
 }
 
 const STORE_API_URL = `${WOOCOMMERCE_URL}/wp-json/wc/store/v1`;
+const WOOCOMMERCE_HOSTNAME = new URL(WOOCOMMERCE_URL).hostname;
+
+function webp(src: string): string {
+  return toWordPressWebp(src, WOOCOMMERCE_HOSTNAME);
+}
 
 interface WCStoreProductImage {
   src: string;
@@ -61,7 +67,7 @@ function toProduct(wc: WCStoreProduct): Product {
     title: wc.name,
     url: `/products/${wc.slug}`,
     image: {
-      src: wc.images[0]?.src ?? "",
+      src: webp(wc.images[0]?.src ?? ""),
       alt: wc.images[0]?.alt || wc.name,
     },
     rating: Number(wc.average_rating),
@@ -124,8 +130,8 @@ export async function getProductBySlug(slug: string): Promise<ProductPageData | 
     id: wc.id,
     title: wc.name,
     images: wc.images.map((img) => ({
-      src: img.src,
-      thumbSrc: img.thumbnail,
+      src: webp(img.src),
+      thumbSrc: webp(img.thumbnail),
       alt: img.alt || wc.name,
     })),
     rating: Number(wc.average_rating),

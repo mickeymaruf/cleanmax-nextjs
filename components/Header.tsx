@@ -5,6 +5,7 @@ import Image from "next/image";
 import Logo from "@/public/clean-max-logo.png";
 import { useHeaderScrollHide } from "./useHeaderScrollHide";
 import { MAIN_MENU_LINKS, SHOP_ALL_LINK, type NavLink as BaseNavLink } from "./navigation";
+import { useCart } from "./CartProvider";
 
 interface GrandChildLink {
   title: string;
@@ -43,6 +44,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const headerRef = useHeaderScrollHide<HTMLElement>();
+  const { cart, openCart } = useCart();
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "";
@@ -174,9 +176,9 @@ export default function Header() {
               ))}
             </div>
 
-            {/* Cart drawer + live item count wiring is a separate task; static placeholder for now */}
             <button
               id="cart-btn"
+              onClick={openCart}
               className="relative p-4 text-[#001689] hover:text-blue-600 transition cursor-pointer"
               aria-label="Open cart"
             >
@@ -195,7 +197,7 @@ export default function Header() {
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
               </svg>
               <span className="cart-count-badge absolute top-1.5 right-2 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                0
+                {cart.itemCount}
               </span>
             </button>
           </div>

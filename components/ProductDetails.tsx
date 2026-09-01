@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import StarRating from "./StarRating";
+import { useCart } from "./CartProvider";
 
 interface GalleryImage {
   src: string;
@@ -64,6 +65,8 @@ const DEFAULT_PAYMENT_ICONS: PaymentIcon[] = [
 ];
 
 export interface ProductDetailsProps {
+  /** WooCommerce numeric product id, used to add this product to the cart */
+  productId: number;
   /** Product title (merchant-editable) */
   title: string;
   /** Subtitle metafield (merchant-editable) */
@@ -129,6 +132,7 @@ function CheckmarkIcon() {
 }
 
 export default function ProductDetails({
+  productId,
   title,
   subtitle,
   images,
@@ -164,6 +168,7 @@ export default function ProductDetails({
 
   const sectionRef = useRef<HTMLElement>(null);
   const [stickyBarHidden, setStickyBarHidden] = useState(true);
+  const { addItem, openCart } = useCart();
 
   const selectedTier = selectedTierIndex >= 0 ? bundleTiers[selectedTierIndex] : undefined;
   const selectedDiscountedPriceCents = selectedTier?.discountedPriceCents ?? priceCents;
@@ -207,11 +212,12 @@ export default function ProductDetails({
     return () => observer.disconnect();
   }, []);
 
-  function handleAddToCart() {
+  async function handleAddToCart() {
     if (isAdding) return;
     setIsAdding(true);
-    // Cart wiring is a separate follow-up task, same placeholder as ProductPurchaseOptions.
+    const success = await addItem(productId, selectedTier?.quantity ?? 1);
     setIsAdding(false);
+    if (success) openCart();
   }
 
   function scrollToBundleOrCart() {

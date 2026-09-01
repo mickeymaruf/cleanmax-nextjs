@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         hostname: "cleanmax.local",
         pathname: "/wp-content/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "srv1945944.hstgr.cloud",
+        pathname: "/wp-content/uploads/**",
+      },
     ],
   },
 };

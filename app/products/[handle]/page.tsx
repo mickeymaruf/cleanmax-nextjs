@@ -52,6 +52,7 @@ export default async function ProductPage({
   return (
     <main className="flex-1">
       <ProductDetails
+        productId={product.id}
         title={product.title}
         subtitle={isAntihongo ? "Eliminá moho sin esfuerzo!" : undefined}
         images={product.images}

@@ -26,6 +26,7 @@ interface WCStoreProductPrices {
 }
 
 interface WCStoreProduct {
+  id: number;
   name: string;
   slug: string;
   short_description: string;
@@ -93,6 +94,7 @@ export interface ProductGalleryImage {
 }
 
 export interface ProductPageData {
+  id: number;
   title: string;
   images: ProductGalleryImage[];
   rating: number;
@@ -119,6 +121,7 @@ export async function getProductBySlug(slug: string): Promise<ProductPageData | 
   if (!wc) return null;
 
   return {
+    id: wc.id,
     title: wc.name,
     images: wc.images.map((img) => ({
       src: img.src,

@@ -82,7 +82,7 @@ function toProduct(wc: WCStoreProduct): Product {
 export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
   const res = await fetch(
     `${STORE_API_URL}/products?featured=true&per_page=${limit}`,
-    { next: { revalidate: 60 } }
+    { next: { revalidate: 86400, tags: ["products"] } }
   );
 
   if (!res.ok) {
@@ -115,7 +115,7 @@ export interface ProductPageData {
 export async function getProductBySlug(slug: string): Promise<ProductPageData | null> {
   const res = await fetch(
     `${STORE_API_URL}/products?slug=${encodeURIComponent(slug)}`,
-    { next: { revalidate: 60 } }
+    { next: { revalidate: 86400, tags: ["products"] } }
   );
 
   if (!res.ok) {
@@ -141,4 +141,28 @@ export async function getProductBySlug(slug: string): Promise<ProductPageData | 
     ),
     descriptionHtml: wc.description,
   };
+}
+
+/** Every product slug, for prebuilding PDPs at build time via generateStaticParams. */
+export async function getAllProductSlugs(): Promise<string[]> {
+  const slugs: string[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const res = await fetch(`${STORE_API_URL}/products?per_page=100&page=${page}`, {
+      next: { revalidate: 86400, tags: ["products"] },
+    });
+
+    if (!res.ok) {
+      throw new Error(`WooCommerce Store API error: ${res.status} ${res.statusText}`);
+    }
+
+    totalPages = Number(res.headers.get("X-WP-TotalPages") ?? 1);
+    const data: WCStoreProduct[] = await res.json();
+    slugs.push(...data.map((wc) => wc.slug));
+    page++;
+  } while (page <= totalPages);
+
+  return slugs;
 }

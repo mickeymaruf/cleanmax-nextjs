@@ -4,7 +4,12 @@ import ProductDescription from "@/components/ProductDescription";
 import ComparisonChart from "@/components/ComparisonChart";
 import ProductReviews from "@/components/ProductReviews";
 import Faq from "@/components/Faq";
-import { getProductBySlug } from "@/lib/woocommerce";
+import { getAllProductSlugs, getProductBySlug } from "@/lib/woocommerce";
+
+export async function generateStaticParams() {
+  const slugs = await getAllProductSlugs();
+  return slugs.map((handle) => ({ handle }));
+}
 
 // Shipping/payment info and trust badges are store-wide policy, not per-product data —
 // same content on every PDP, same as the live Shopify site's schema defaults.

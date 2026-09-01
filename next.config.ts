@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "srv1945944.hstgr.cloud",
+        hostname: "api.srv1945944.hstgr.cloud",
         pathname: "/wp-content/uploads/**",
       },
     ],

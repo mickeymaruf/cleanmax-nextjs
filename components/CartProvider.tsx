@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useOptimistic,
   useRef,
   useState,
@@ -36,14 +37,32 @@ function withItemCount(cart: Cart): Cart {
   return { ...cart, itemCount: cart.items.reduce((sum, item) => sum + item.quantity, 0) };
 }
 
+const EMPTY_CART: Cart = { items: [], itemCount: 0, subtotal: 0, subtotalFormatted: "$0" };
+
 export default function CartProvider({
-  initialCart,
+  initialCart = EMPTY_CART,
   children,
 }: {
-  initialCart: Cart;
+  initialCart?: Cart;
   children: ReactNode;
 }) {
   const [cart, setCart] = useState(initialCart);
+
+  // The layout no longer fetches the cart server-side (that would force every page
+  // dynamic, defeating static generation) — so the real cart loads client-side here,
+  // right after hydration, and briefly shows empty until this resolves.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/cart")
+      .then((res) => (res.ok ? (res.json() as Promise<Cart>) : null))
+      .then((fetchedCart) => {
+        if (!cancelled && fetchedCart) setCart(fetchedCart);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const [optimisticCart, applyOptimistic] = useOptimistic(
     cart,
     (state: Cart, updater: (current: Cart) => Cart) => updater(state),

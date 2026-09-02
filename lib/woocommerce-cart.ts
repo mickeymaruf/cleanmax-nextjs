@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import { toWordPressWebp } from "@/lib/wordpress-image";
 
 const WOOCOMMERCE_URL = process.env.WOOCOMMERCE_URL;
 
@@ -8,11 +7,6 @@ if (!WOOCOMMERCE_URL) {
 }
 
 const STORE_API_URL = `${WOOCOMMERCE_URL}/wp-json/wc/store/v1`;
-const WOOCOMMERCE_HOSTNAME = new URL(WOOCOMMERCE_URL).hostname;
-
-function webp(src: string): string {
-  return toWordPressWebp(src, WOOCOMMERCE_HOSTNAME);
-}
 
 const CART_TOKEN_COOKIE = "wc_cart_token";
 const CART_NONCE_COOKIE = "wc_cart_nonce";
@@ -90,7 +84,7 @@ function normalizeCart(wc: WCStoreCart): Cart {
       name: item.name,
       quantity: item.quantity,
       image: {
-        src: webp(item.images[0]?.src ?? ""),
+        src: item.images[0]?.src ?? "",
         alt: item.images[0]?.alt || item.name,
       },
       price: formatMoney(item.prices.price, item.prices.currency_minor_unit, item.prices.currency_code),

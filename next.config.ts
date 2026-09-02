@@ -26,12 +26,14 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+      unoptimized: true,
     // cleanmax.local (LocalWP) resolves to 127.0.0.1 — dev-only, matches WOOCOMMERCE_URL in .env.local
     dangerouslyAllowLocalIP: true,
     remotePatterns: [
       {
         protocol: "https",
         hostname: "cleanmax.com.ar",
+        pathname: "/cdn/shop/**",
       },
       {
         protocol: "https",
@@ -40,6 +42,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'pub-*.r2.dev', // Legacy R2 dev URL
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.limpmax.com.ar', // R2 bucket URL
       },
     ],
   },

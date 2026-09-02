@@ -17,8 +17,19 @@ function webp(src: string): string {
 const CART_TOKEN_COOKIE = "wc_cart_token";
 const CART_NONCE_COOKIE = "wc_cart_nonce";
 
+// Tested against the real backend: it never sets a browser session cookie for Store API calls,
+// only Cart-Token/Nonce headers — so cart identity has to stay Cart-Token-based. Routes through
+// /checkout-redirect (a Route Handler that can read the httpOnly token cookie) rather than
+// linking straight to /checkout, so it can append `?session=<token>` — WooCommerce's own built-in
+// hand-off (WC_Session_Handler::init_session_from_request()) that clones that cart into a real
+// cookie-backed session before the (reverse-proxied, see next.config.ts) checkout page renders.
 export function getCheckoutUrl(): string {
-  return `${WOOCOMMERCE_URL}/checkout`;
+  return "/checkout-redirect";
+}
+
+export async function getCartToken(): Promise<string | undefined> {
+  const cookieStore = await cookies();
+  return cookieStore.get(CART_TOKEN_COOKIE)?.value;
 }
 
 export interface CartItem {

@@ -16,9 +16,9 @@ const nextConfig: NextConfig = {
     return [
       // WordPress 301s /checkout -> /checkout/ (trailing slash) using its own absolute site
       // URL, which would carry the browser off our domain — so proxy straight to the canonical,
-      // slash-terminated path and skip that redirect entirely.
-      { source: "/checkout", destination: `${WOOCOMMERCE_URL}/checkout/` },
-      { source: "/checkout/:path*", destination: `${WOOCOMMERCE_URL}/checkout/:path*` },
+      // slash-terminated path and skip that redirect entirely. Exposed on our domain as /pago.
+      { source: "/pago", destination: `${WOOCOMMERCE_URL}/checkout/` },
+      { source: "/pago/:path*", destination: `${WOOCOMMERCE_URL}/checkout/:path*` },
       { source: "/cart", destination: `${WOOCOMMERCE_URL}/cart/` },
       { source: "/my-account", destination: `${WOOCOMMERCE_URL}/my-account/` },
       { source: "/my-account/:path*", destination: `${WOOCOMMERCE_URL}/my-account/:path*` },
@@ -26,7 +26,6 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-      unoptimized: true,
     // cleanmax.local (LocalWP) resolves to 127.0.0.1 — dev-only, matches WOOCOMMERCE_URL in .env.local
     dangerouslyAllowLocalIP: true,
     remotePatterns: [

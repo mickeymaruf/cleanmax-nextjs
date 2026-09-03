@@ -249,6 +249,7 @@ export default function ProductDetails({
                   alt={image.alt ?? title}
                   width={100}
                   height={100}
+                  unoptimized
                   className="h-full w-full object-cover"
                 />
               </button>
@@ -262,6 +263,7 @@ export default function ProductDetails({
               width={800}
               height={800}
               sizes="(min-width: 1024px) 65vw, 100vw"
+              unoptimized
               className="w-full object-cover"
               priority
             />

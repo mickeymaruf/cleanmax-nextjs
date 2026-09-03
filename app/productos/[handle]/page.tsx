@@ -1,14 +1,31 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProductDetails, { type ProductDetailsProps } from "@/components/ProductDetails";
 import ProductDescription from "@/components/ProductDescription";
 import ComparisonChart from "@/components/ComparisonChart";
 import ProductReviews from "@/components/ProductReviews";
 import Faq from "@/components/Faq";
-import { getAllProductSlugs, getProductBySlug } from "@/lib/woocommerce";
+import ProductList from "@/components/ProductList";
+import { getAllProductSlugs, getFeaturedProducts, getProductBySlug } from "@/lib/woocommerce";
 
 export async function generateStaticParams() {
   const slugs = await getAllProductSlugs();
   return slugs.map((handle) => ({ handle }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}): Promise<Metadata> {
+  const { handle } = await params;
+  const product = await getProductBySlug(handle);
+
+  if (!product) {
+    return {};
+  }
+
+  return { title: product.title };
 }
 
 // Shipping/payment info and trust badges are store-wide policy, not per-product data —
@@ -44,7 +61,10 @@ export default async function ProductPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const product = await getProductBySlug(handle);
+  const [product, featuredProducts] = await Promise.all([
+    getProductBySlug(handle),
+    getFeaturedProducts(4),
+  ]);
 
   if (!product) {
     notFound();
@@ -295,6 +315,7 @@ export default async function ProductPage({
         />
         </>
       )}
+      <ProductList title="Tu Equipo de Limpieza" products={featuredProducts} />
     </main>
   );
 }

@@ -24,6 +24,7 @@ export default function ProductCard({ product }: { product: Product }) {
             width={600}
             height={600}
             sizes="(min-width: 1024px) 25vw, 45vw"
+            unoptimized
             className="aspect-square w-full lg:h-full object-cover"
           />
         </a>

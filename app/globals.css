@@ -51,3 +51,11 @@ body {
 #MainHeader.is-scrolled-up {
   transform: translateY(var(--announce-height-neg)) !important;
 }
+
+/* Desktop: whole header (announcement bar included) just stays put — no hide/slide animation */
+@media (min-width: 1024px) {
+  #AnnouncementBar.is-scrolled-up,
+  #MainHeader.is-scrolled-up {
+    transform: none !important;
+  }
+}

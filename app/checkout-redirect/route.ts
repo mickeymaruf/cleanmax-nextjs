@@ -3,17 +3,17 @@ import { cookies } from "next/headers";
 import { getCartToken } from "@/lib/woocommerce-cart";
 
 /**
- * The "Comprar" link's actual target. /checkout itself is reverse-proxied straight to WordPress
- * (see next.config.ts) so it stays on our domain, but WooCommerce's Store API never gives us a
- * browser session cookie for our cart (verified against the real backend) — only a Cart-Token.
- * The classic checkout page render doesn't look at that header at all, so without this hop it
- * would show an empty cart. `?session=<cart-token>` is WooCommerce's own built-in hand-off
- * (WC_Session_Handler::init_session_from_request(), core — no custom WordPress code needed): it
- * clones that guest cart into a real cookie-backed session before the checkout page renders.
+ * The "Comprar" link's actual target. /pago itself is reverse-proxied straight to WordPress's
+ * /checkout/ (see next.config.ts) so it stays on our domain, but WooCommerce's Store API never
+ * gives us a browser session cookie for our cart (verified against the real backend) — only a
+ * Cart-Token. The classic checkout page render doesn't look at that header at all, so without
+ * this hop it would show an empty cart. `?session=<cart-token>` is WooCommerce's own built-in
+ * hand-off (WC_Session_Handler::init_session_from_request(), core — no custom WordPress code
+ * needed): it clones that guest cart into a real cookie-backed session before /pago renders.
  */
 export async function GET() {
   const cartToken = await getCartToken();
-  const target = cartToken ? `/checkout?session=${encodeURIComponent(cartToken)}` : "/checkout";
+  const target = cartToken ? `/pago?session=${encodeURIComponent(cartToken)}` : "/pago";
 
   // A relative Location header, resolved by the browser against the domain it's actually on —
   // NOT NextResponse.redirect(new URL(target, request.url)), which behind production's reverse

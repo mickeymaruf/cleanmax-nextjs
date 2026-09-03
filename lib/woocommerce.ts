@@ -59,7 +59,7 @@ function getSize(attributes: WCStoreProductAttribute[]): string {
 function toProduct(wc: WCStoreProduct): Product {
   return {
     title: wc.name,
-    url: `/products/${wc.slug}`,
+    url: `/productos/${wc.slug}`,
     image: {
       src: wc.images[0]?.src ?? "",
       alt: wc.images[0]?.alt || wc.name,
@@ -85,6 +85,30 @@ export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
 
   const data: WCStoreProduct[] = await res.json();
   return data.map(toProduct);
+}
+
+/** Every product in the store, for the full catalog listing pages. */
+export async function getAllProducts(): Promise<Product[]> {
+  const products: Product[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const res = await fetch(`${STORE_API_URL}/products?per_page=100&page=${page}`, {
+      next: { revalidate: 86400, tags: ["products"] },
+    });
+
+    if (!res.ok) {
+      throw new Error(`WooCommerce Store API error: ${res.status} ${res.statusText}`);
+    }
+
+    totalPages = Number(res.headers.get("X-WP-TotalPages") ?? 1);
+    const data: WCStoreProduct[] = await res.json();
+    products.push(...data.map(toProduct));
+    page++;
+  } while (page <= totalPages);
+
+  return products;
 }
 
 export interface ProductGalleryImage {

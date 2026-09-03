@@ -12,11 +12,11 @@ export default async function Home() {
       <Hero
         bgColor="#ffffff"
         imageDesktop={{
-          src: "https://cleanmax.com.ar/cdn/shop/files/ChatGPT_Image_6_jun_2026_01_08_10_p.m._2000x.png?v=1780762100",
+          src: "/ChatGPT_Image_6_jun_2026_01_08_10_p.m..png",
           alt: "",
         }}
         imageMobile={{
-          src: "https://cleanmax.com.ar/cdn/shop/files/ChatGPT_Image_5_jun_2026_11_25_13_p.m._800x.png?v=1780712738",
+          src: "/ChatGPT_Image_5_jun_2026_11_25_13_p.m..png",
         }}
         title="Hecho para el Hogar"
         description="Descubrí nuestra línea completa de limpieza."

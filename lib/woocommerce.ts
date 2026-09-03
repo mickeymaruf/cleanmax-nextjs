@@ -36,6 +36,12 @@ interface WCStoreProduct {
   images: WCStoreProductImage[];
   attributes: WCStoreProductAttribute[];
   prices: WCStoreProductPrices;
+  extensions?: {
+    my_custom_fields?: {
+      rating?: number;
+      review_count?: number;
+    };
+  };
 }
 
 function stripHtml(html: string): string {
@@ -56,20 +62,59 @@ function getSize(attributes: WCStoreProductAttribute[]): string {
   return attributes.find((attr) => attr.name === "Size")?.terms[0]?.name ?? "";
 }
 
+// The Store API's own average_rating/review_count stay 0 (no reviews approved yet) — a plugin
+// (`my_custom_fields`) supplies the real numbers instead. Rolling out product by product, so
+// fall back to the Store API's fields until every product has it.
+function getRating(wc: WCStoreProduct): { rating: number; ratingCount: number } {
+  const custom = wc.extensions?.my_custom_fields;
+  return {
+    rating: custom?.rating ?? Number(wc.average_rating),
+    ratingCount: custom?.review_count ?? wc.review_count,
+  };
+}
+
 function toProduct(wc: WCStoreProduct): Product {
   return {
+    id: wc.id,
     title: wc.name,
     url: `/productos/${wc.slug}`,
     image: {
       src: wc.images[0]?.src ?? "",
       alt: wc.images[0]?.alt || wc.name,
     },
-    rating: Number(wc.average_rating),
-    ratingCount: wc.review_count,
+    ...getRating(wc),
     shortDescription: stripHtml(wc.short_description),
     size: getSize(wc.attributes),
     price: formatPrice(wc.prices),
   };
+}
+
+export interface ProductCartDetails {
+  /** A plain product attribute, not a cart-line variation, so the Store API's cart
+   *  response never carries it on line items. */
+  size: string;
+  /** Our own /productos/<slug> route — the cart's own `permalink` field points at the
+   *  WooCommerce backend domain, not this site. */
+  url: string;
+}
+
+/** Batched product lookup used to backfill cart line items with data the cart response omits. */
+export async function getProductCartDetailsByIds(ids: number[]): Promise<Map<number, ProductCartDetails>> {
+  if (ids.length === 0) return new Map();
+
+  const res = await fetch(
+    `${STORE_API_URL}/products?include=${ids.join(",")}&per_page=${ids.length}`,
+    { next: { revalidate: 86400, tags: ["products"] } }
+  );
+
+  if (!res.ok) {
+    throw new Error(`WooCommerce Store API error: ${res.status} ${res.statusText}`);
+  }
+
+  const data: WCStoreProduct[] = await res.json();
+  return new Map(
+    data.map((wc) => [wc.id, { size: getSize(wc.attributes), url: `/productos/${wc.slug}` }])
+  );
 }
 
 /** Products marked "Featured" in WooCommerce (merchant-editable, mirrors the Shopify collection picker) */
@@ -152,8 +197,7 @@ export async function getProductBySlug(slug: string): Promise<ProductPageData | 
       thumbSrc: img.thumbnail,
       alt: img.alt || wc.name,
     })),
-    rating: Number(wc.average_rating),
-    ratingCount: wc.review_count,
+    ...getRating(wc),
     priceCents: Math.round(
       (Number(wc.prices.price) / 10 ** wc.prices.currency_minor_unit) * 100
     ),

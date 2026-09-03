@@ -60,7 +60,7 @@ export default function Header() {
         ref={headerRef}
         className="site-header relative bg-white lg:border-b lg:border-gray-100"
       >
-        <div className="relative top-0.5 mx-auto flex w-full max-w-7xl items-center px-4 lg:px-5 py-3 md:py-4">
+        <div className="relative top-0.5 mx-auto flex w-full max-w-7xl items-center py-3 md:py-4">
           <div className="flex w-1/3 lg:w-fit lg:grow lg:basis-auto header-left">
             <button
               className="lg:hidden bg-transparent border-none shadow-none outline-none p-4 transition hover:opacity-50"

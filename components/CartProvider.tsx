@@ -68,6 +68,14 @@ export default function CartProvider({
     (state: Cart, updater: (current: Cart) => Cart) => updater(state),
   );
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   const [isPending, startTransition] = useTransition();
   // Chains mutations so rapid stepper clicks dispatch to WooCommerce one at a time, in
   // order — avoids the lost-update races a quantity stepper is prone to under concurrent requests.

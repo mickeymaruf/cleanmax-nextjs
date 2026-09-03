@@ -3,6 +3,8 @@ import StarRating from "./StarRating";
 import ProductPurchaseOptions from "./ProductPurchaseOptions";
 
 export interface Product {
+  /** WooCommerce numeric product id, used to add this product to the cart */
+  id: number;
   title: string;
   url: string;
   image: { src: string; alt?: string };
@@ -68,7 +70,12 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Hover View (Desktop Only) */}
         <div className="hidden lg:group-hover:block">
-          <ProductPurchaseOptions productUrl={product.url} size={product.size} price={product.price} />
+          <ProductPurchaseOptions
+            productId={product.id}
+            productUrl={product.url}
+            size={product.size}
+            price={product.price}
+          />
         </div>
       </div>
 
@@ -100,7 +107,12 @@ export default function ProductCard({ product }: { product: Product }) {
                 <h3 className="font-bold text-lg">{product.title}</h3>
               </div>
             </div>
-            <ProductPurchaseOptions productUrl={product.url} size={product.size} price={product.price} />
+            <ProductPurchaseOptions
+            productId={product.id}
+            productUrl={product.url}
+            size={product.size}
+            price={product.price}
+          />
           </div>
         </div>
       </div>

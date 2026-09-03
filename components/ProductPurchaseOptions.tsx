@@ -1,4 +1,11 @@
+"use client";
+
+import { useState } from "react";
+import { useCart } from "./CartProvider";
+
 interface ProductPurchaseOptionsProps {
+  /** WooCommerce numeric product id, used to add this product to the cart */
+  productId: number;
   productUrl: string;
   /** Only variant size shown for now — no live switching yet, see PROGRESS.md */
   size: string;
@@ -6,10 +13,22 @@ interface ProductPurchaseOptionsProps {
 }
 
 export default function ProductPurchaseOptions({
+  productId,
   productUrl,
   size,
   price,
 }: ProductPurchaseOptionsProps) {
+  const [isAdding, setIsAdding] = useState(false);
+  const { addItem, openCart } = useCart();
+
+  async function handleAddToCart() {
+    if (isAdding) return;
+    setIsAdding(true);
+    const success = await addItem(productId, 1);
+    setIsAdding(false);
+    if (success) openCart();
+  }
+
   return (
     <div className="flex flex-col pb-4">
       <div className="grid grid-cols-3 gap-2 mb-3">
@@ -23,12 +42,15 @@ export default function ProductPurchaseOptions({
         </button>
       </div>
 
-      {/* Add-to-cart wiring is a separate follow-up task, same as the header cart button */}
       <button
         type="button"
-        className="mt-2 bg-[#001689] text-white w-full py-4 px-4 rounded-xs flex justify-between items-center font-bold text-xs tracking-wide uppercase cursor-pointer"
+        disabled={isAdding}
+        onClick={handleAddToCart}
+        className={`mt-2 w-full py-4 px-4 rounded-xs flex justify-between items-center font-bold text-xs tracking-wide uppercase transition-all ${
+          isAdding ? "cursor-not-allowed bg-[#001689]/75 text-white" : "cursor-pointer bg-[#001689] text-white"
+        }`}
       >
-        <span>AGREGAR AL CARRITO</span>
+        <span>{isAdding ? "AGREGANDO..." : "AGREGAR AL CARRITO"}</span>
         <span>{price}</span>
       </button>
 

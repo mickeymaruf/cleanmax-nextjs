@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { getProductCartDetailsByIds } from "./woocommerce";
 
 const WOOCOMMERCE_URL = process.env.WOOCOMMERCE_URL;
 
@@ -30,10 +31,13 @@ export interface CartItem {
   key: string;
   productId: number;
   name: string;
+  size: string;
   quantity: number;
   image: { src: string; alt: string };
   price: string;
   lineTotal: string;
+  /** Pre-discount line price, only set when it differs from lineTotal */
+  originalLineTotal?: string;
   url: string;
 }
 
@@ -52,8 +56,14 @@ interface WCStoreCartItem {
   name: string;
   images: { src: string; thumbnail: string; alt: string }[];
   permalink: string;
+  variation?: { attribute: string; value: string }[];
   prices: { price: string; currency_code: string; currency_minor_unit: number };
-  totals: { line_total: string; currency_code: string; currency_minor_unit: number };
+  totals: {
+    line_subtotal: string;
+    line_total: string;
+    currency_code: string;
+    currency_minor_unit: number;
+  };
 }
 
 interface WCStoreCart {
@@ -76,21 +86,32 @@ function formatMoney(amount: string, minorUnit: number, currencyCode: string): s
   }).format(value);
 }
 
-function normalizeCart(wc: WCStoreCart): Cart {
+async function normalizeCart(wc: WCStoreCart): Promise<Cart> {
+  const uniqueProductIds = [...new Set(wc.items.map((item) => item.id))];
+  const detailsByProductId = await getProductCartDetailsByIds(uniqueProductIds);
+
   return {
-    items: wc.items.map((item) => ({
-      key: item.key,
-      productId: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      image: {
-        src: item.images[0]?.src ?? "",
-        alt: item.images[0]?.alt || item.name,
-      },
-      price: formatMoney(item.prices.price, item.prices.currency_minor_unit, item.prices.currency_code),
-      lineTotal: formatMoney(item.totals.line_total, item.totals.currency_minor_unit, item.totals.currency_code),
-      url: item.permalink,
-    })),
+    items: wc.items.map((item) => {
+      const details = detailsByProductId.get(item.id);
+      return {
+        key: item.key,
+        productId: item.id,
+        name: item.name,
+        size: item.variation?.find((v) => v.attribute === "Size")?.value || details?.size || "",
+        quantity: item.quantity,
+        image: {
+          src: item.images[0]?.src ?? "",
+          alt: item.images[0]?.alt || item.name,
+        },
+        price: formatMoney(item.prices.price, item.prices.currency_minor_unit, item.prices.currency_code),
+        lineTotal: formatMoney(item.totals.line_total, item.totals.currency_minor_unit, item.totals.currency_code),
+        originalLineTotal:
+          item.totals.line_subtotal !== item.totals.line_total
+            ? formatMoney(item.totals.line_subtotal, item.totals.currency_minor_unit, item.totals.currency_code)
+            : undefined,
+        url: details?.url ?? item.permalink,
+      };
+    }),
     itemCount: wc.items_count,
     subtotal: Math.round(
       (Number(wc.totals.total_items) / 10 ** wc.totals.currency_minor_unit) * 100

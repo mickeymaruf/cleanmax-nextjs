@@ -7,6 +7,7 @@ import CartProvider from "@/components/CartProvider";
 import CartDrawer from "@/components/CartDrawer";
 import { MAIN_MENU_LINKS, SHOP_ALL_LINK } from "@/components/navigation";
 import { getCheckoutUrl } from "@/lib/woocommerce-cart";
+import { getFreeShippingThresholdCents } from "@/lib/woocommerce-admin";
 import "./globals.css";
 
 const SITE_TITLE = "Clean Max - Limpieza Definitiva";
@@ -40,7 +41,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const freeShippingThresholdCents = await getFreeShippingThresholdCents();
+
   return (
     <html
       lang="es"
@@ -56,7 +59,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             />
             <Header />
           </div>
-          <CartDrawer checkoutUrl={getCheckoutUrl()} />
+          <CartDrawer
+            checkoutUrl={getCheckoutUrl()}
+            freeShippingThresholdCents={freeShippingThresholdCents}
+          />
           {children}
           <Footer
             bgColor="#000e8a"

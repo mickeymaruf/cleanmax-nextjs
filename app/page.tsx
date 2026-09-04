@@ -12,11 +12,11 @@ export default async function Home() {
       <Hero
         bgColor="#ffffff"
         imageDesktop={{
-          src: "/ChatGPT_Image_6_jun_2026_01_08_10_p.m..png",
+          src: "/hero-desktop.webp",
           alt: "",
         }}
         imageMobile={{
-          src: "/ChatGPT_Image_5_jun_2026_11_25_13_p.m..png",
+          src: "/hero-mobile.webp",
         }}
         title="Hecho para el Hogar"
         description="Descubrí nuestra línea completa de limpieza."

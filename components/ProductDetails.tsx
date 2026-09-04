@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import StarRating from "./StarRating";
 import { useCart } from "./CartProvider";
 
@@ -159,7 +160,8 @@ export default function ProductDetails({
   impactHtml,
   stickyButtonLabel = "PROBÁ CLEAN MAX",
 }: ProductDetailsProps) {
-  const [mainImage, setMainImage] = useState(images[0]?.src ?? "");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const touchStartXRef = useRef<number | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "ingredients" | "impact">("overview");
   const [isAdding, setIsAdding] = useState(false);
   const [selectedTierIndex, setSelectedTierIndex] = useState(() =>
@@ -234,14 +236,14 @@ export default function ProductDetails({
       {/* LEFT SIDE: Product Gallery */}
       <div className="w-full lg:w-[65%] lg:sticky lg:top-0 h-fit">
         <div className="flex flex-col md:flex-row gap-2">
-          <div className="order-2 flex w-full gap-3 overflow-x-auto pb-1 md:order-1 md:w-16 md:flex-col md:overflow-visible md:pb-0 shrink-0">
+          <div className="order-2 flex w-full gap-3 overflow-x-auto pb-1 pl-1 pt-1 md:order-1 md:w-16 md:flex-col md:overflow-visible md:pb-0 md:pl-0 md:pt-0 shrink-0">
             {images.map((image, i) => (
               <button
                 key={i}
                 type="button"
-                onClick={() => setMainImage(image.src)}
+                onClick={() => setCurrentImageIndex(i)}
                 className={`aspect-square h-16 w-16 shrink-0 cursor-pointer overflow-hidden outline transition-all hover:outline-primary ${
-                  mainImage === image.src ? "outline-3 outline-primary" : "outline-1 outline-gray-200"
+                  currentImageIndex === i ? "outline-3 outline-primary" : "outline-1 outline-gray-200"
                 }`}
               >
                 <Image
@@ -256,17 +258,61 @@ export default function ProductDetails({
             ))}
           </div>
 
-          <div className="order-1 flex-1 md:order-2">
-            <Image
-              src={mainImage || images[0]?.src || ""}
-              alt={title}
-              width={800}
-              height={800}
-              sizes="(min-width: 1024px) 65vw, 100vw"
-              unoptimized
-              className="w-full object-cover"
-              priority
-            />
+          <div className="relative order-1 flex-1 overflow-hidden md:order-2">
+            <div
+              className="flex transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+              onTouchStart={(e) => {
+                touchStartXRef.current = e.touches[0].clientX;
+              }}
+              onTouchEnd={(e) => {
+                if (touchStartXRef.current === null) return;
+                const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+                touchStartXRef.current = null;
+                if (Math.abs(deltaX) < 40) return;
+                if (deltaX < 0) {
+                  setCurrentImageIndex((i) => (i + 1) % images.length);
+                } else {
+                  setCurrentImageIndex((i) => (i - 1 + images.length) % images.length);
+                }
+              }}
+            >
+              {images.map((image, i) => (
+                <div key={i} className="w-full shrink-0">
+                  <Image
+                    src={image.src}
+                    alt={image.alt ?? title}
+                    width={800}
+                    height={800}
+                    sizes="(min-width: 1024px) 65vw, 100vw"
+                    unoptimized
+                    className="w-full object-cover"
+                    priority={i === 0}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Imagen anterior"
+                  onClick={() => setCurrentImageIndex((i) => (i - 1 + images.length) % images.length)}
+                  className="absolute left-0 top-1/2 flex h-[40px] w-[40px] -translate-y-1/2 cursor-pointer items-center justify-center rounded-r-full bg-white pr-[8px] font-extrabold text-[#4a77fa] md:hidden"
+                >
+                  <GoChevronLeft size={48} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Siguiente imagen"
+                  onClick={() => setCurrentImageIndex((i) => (i + 1) % images.length)}
+                  className="absolute right-0 top-1/2 flex h-[40px] w-[40px] -translate-y-1/2 cursor-pointer items-center justify-center rounded-l-full bg-white pl-[8px] font-extrabold text-[#4a77fa] md:hidden"
+                >
+                  <GoChevronRight size={48} />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
